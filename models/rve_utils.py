@@ -1,11 +1,12 @@
 from gmshModel.Model import RandomInclusionRVE
-from .domain import *
-from .util import *
+from ..src.domain import *
 import numpy as np
 import os 
+import meshio 
 
 
-class GENERATE_RVE():
+
+class Create_RVE_gmshModel():
 
     """
 
@@ -13,13 +14,11 @@ class GENERATE_RVE():
 
     """
 
-    def __init__(self, dim=2, Lc=4, r=0.3, directory=None, name='gmshModelRVE-collect', ext='.msh'):
+    def __init__(self, dim=2, directory=None, name='gmshModelRVE-collect', ext='.msh'):
         
         """ Initialize """
 
         self.dim = dim                      # Dimension of RVE 2 or 3 
-        self.Lc = Lc                        # Size of the RVE
-        self.r = r                          # size of the inclusions
 
         self.write_ext = ext                # Extension for saving 
         self.read_ext = '.xdmf'             # Extension for reading 
@@ -30,16 +29,19 @@ class GENERATE_RVE():
         else:
             self.directory_base = directory
 
-        self.directory_base += '/'+str(dim)+'D/L:'+str(Lc)+'/r:'+str(r)
 
 
-    def __call__(self,Vf,tag=None):              
+    def __call__(self, Lc, r, Vf, tag=None):              
 
         """ Call for the volume fraction of desire """
 
         self.directory = self.directory_base + '/Vf:'+str(int(Vf*100))
 
         self.init_Vf = Vf 
+        self.Lc = Lc
+        self.r = r
+
+        self.directory += '-'+str(self.dim)+'D-L:'+str(self.Lc)+'-r:'+str(self.r)
 
         try:
 
@@ -52,6 +54,7 @@ class GENERATE_RVE():
         self.extract_info()
         
         self.domain = DOMAIN(self.directory+self.read_ext)
+        return self.domain
 
 
     def create(self,tag,filename= "rve"):
@@ -143,5 +146,58 @@ class GENERATE_RVE():
         """ Method: Extract all the information needed from xdmf file """
 
         xdmf_extract(self.directory+self.write_ext)
+
+##############################################################################################
+# UTILITIES for preparing the domain for fenics
+##############################################################################################
+
+def dolfin_convert(filename):
+    """
+        Convert the .msh file with msh2 format to xml using dolfin-convert
+    *** Legacy format try not to use it!
+    """
+    name, _ =  os.path.splitext(filename)
+    os.system('dolfin-convert '+str(filename)+' '+str(name)+'.xml')
+
+def xdmf_extract(filename):
+    """
+        dolfin-convert like funnction for the output from gmshModel
+    *** TO DO: Extend the order of elements that can be extracted.
+    
+    """
+    def extract(mesh,cell_type):
+        cells = np.vstack([cell.data for cell in mesh.cells if cell.type==cell_type])
+        data = np.hstack([mesh.cell_data_dict["gmsh:physical"][key]
+                               for key in mesh.cell_data_dict["gmsh:physical"].keys() if key==cell_type])
+        mesh = meshio.Mesh(points=mesh.points, cells={cell_type: cells},
+                                   cell_data={"name_to_read":[data]})
+        return mesh
+
+
+    name, _ =  os.path.splitext(filename)
+    
+    mesh = meshio.read(filename)
+    
+    dim = (np.sum(np.max(mesh.points, axis=0) - np.min(mesh.points, axis=0) > 1e-15))
+
+    if dim == 2:
+        physical = extract(mesh,"triangle")
+        facet= extract(mesh,"line")
+        meshio.write(name+"_physical_region.xdmf", physical)
+        meshio.write(name+"_facet_region.xdmf", facet)
+        mesh.remove_lower_dimensional_cells()
+        mesh.prune_z_0()
+        mesh = extract(mesh,'triangle')
+        meshio.write(name+".xdmf", mesh)
+
+    elif dim == 3:
+        physical = extract(mesh,"tetra")
+        facet= extract(mesh,"triangle")
+        meshio.write(name+"_physical_region.xdmf", physical)
+        meshio.write(name+"_facet_region.xdmf", facet)
+        mesh = extract(mesh,'tetra')
+        meshio.write(name+".xdmf", mesh)
+    else:
+        raise Exception("Sorry, not implimented yet!")
 
 
