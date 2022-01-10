@@ -3,9 +3,9 @@ from .bc import *
 from ufl import algorithms
 from .continuum import * 
 
-class model():
+class RVE():
     """ 
-        GENERAL MODEL FENICS IMPLEMENTATION 
+        GENERAL RVE FENICS IMPLEMENTATION 
 
         *** Base model class where you combine your domain, boundary
                 condtions information to solve a BVP

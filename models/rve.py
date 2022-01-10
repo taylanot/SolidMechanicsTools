@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # problem has to match!
 ################################################################################################################
 
-class NeoHookean_Kirchhiff_RVE(model):
+class NeoHookean_Kirchhiff_RVE(RVE):
     """ 
         General RVE model implementation
     """
@@ -20,9 +20,8 @@ class NeoHookean_Kirchhiff_RVE(model):
         """ Initialize """
 
         bc = PeriodicBoundary(domain,periodicity=list(range(domain.dim)),tolerance=1e-10)   # Initialize periodic boundary conditions
-        model.__init__(self,domain,bc, Ve)              # Initialize base-class
+        RVE.__init__(self,domain,bc, Ve)              # Initialize base-class
 
-        self.model_tag = model_tag
 
         ################################
         # Mixed function space initialization with periodic boundary conditions
@@ -40,6 +39,9 @@ class NeoHookean_Kirchhiff_RVE(model):
         self.F_macro = F_macro
         self.convergence = True
         self.time = time
+        self.solver()
+        S, _ = self.postprocess()
+        return S
 
     def problem(self):
 
@@ -74,16 +76,21 @@ class NeoHookean_Kirchhiff_RVE(model):
         
         self.PI += dot(lamb_,u)*dx + dot(c,v_)*dx
 
+        return self.PI
 
-    def solver(self):
+
+    def solver(self, prm=None,cprm=None):
 
         """ Method: Define solver options with your solver """
 
-        self.problem()
-        prm = {"newton_solver":
-                {"absolute_tolerance":1e-7,'relative_tolerance':1e-7,'relaxation_parameter':1.0,'linear_solver' : 'mumps'}}
+        if prm == None:
+
+            prm = {"newton_solver":
+                    {"absolute_tolerance":1e-7,'relative_tolerance':1e-7,'relaxation_parameter':1.0,'linear_solver' : 'mumps'}}
+        if cprm == None:
+            cprm = {"optimize": True}
         try:
-            solve(self.PI==0, self.w, [],solver_parameters=prm,form_compiler_parameters={"optimize": True},)
+            solve(self.problem()==0, self.w, [],solver_parameters=prm,form_compiler_parameters=cprm)
             (self.v, lamb) = self.w.split(True)
         except:
             self.convergence = False
@@ -97,7 +104,7 @@ class NeoHookean_Kirchhiff_RVE(model):
                     second Piola-Kirchhoff stress tensor 
         """
         if self.convergence is False:
-            S = np.zeros((self.domain.dim,self.domain.dim))
+            S = np.zeros((self.domain.dim,self.domain.dim)) * nan
         else:
             
             P = self.__project_P()                          # Project first Piola-Kirchhoff stress tensor 
