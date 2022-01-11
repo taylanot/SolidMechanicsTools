@@ -28,9 +28,9 @@ class NeoHookean_Kirchhiff_RVE(RVE):
         ################################
         self.W = FunctionSpace(self.domain.mesh, MixedElement([self.Ve, self.Re]), constrained_domain=self.bc)
 
-        self.fileResults = XDMFFile("output.xdmf")
-        self.fileResults.parameters["flush_output"] = True
-        self.fileResults.parameters["functions_share_mesh"] = True
+        #self.fileResults = XDMFFile("output.xdmf")
+        #self.fileResults.parameters["flush_output"] = True
+        #self.fileResults.parameters["functions_share_mesh"] = True
 
     def __call__(self,F_macro,time=0):
         
@@ -146,7 +146,7 @@ class NeoHookean_Kirchhiff_RVE(RVE):
         b_proj = inner(self.material[0].P,v_)*dx(1) +inner(self.material[1].P,v_)*dx(2)
         P = Function(V,name='Piola')
         solve(a_proj==b_proj,P)
-        self.fileResults.write(P,self.time)
+        #self.fileResults.write(P,self.time)
         return P
 
     def __project_u(self):
@@ -172,7 +172,7 @@ class NeoHookean_Kirchhiff_RVE(RVE):
         b_proj = inner(write,v_)*dx
         u = Function(V,name='Displacement')
         solve(a_proj==b_proj,u,solver_parameters={"linear_solver": "mumps"} )
-        self.fileResults.write(u,self.time)
+        #self.fileResults.write(u,self.time)
         return u
         
 

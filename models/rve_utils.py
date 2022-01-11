@@ -4,8 +4,6 @@ import numpy as np
 import os 
 import meshio 
 
-
-
 class Create_RVE_gmshModel():
 
     """
@@ -54,7 +52,7 @@ class Create_RVE_gmshModel():
         self.extract_info()
         
         self.domain = DOMAIN(self.directory+self.read_ext)
-        return self.domain
+        return self.domain, self.directory
 
 
     def create(self,tag,filename= "rve"):
@@ -90,7 +88,7 @@ class Create_RVE_gmshModel():
             "domainGroup": "domain",                                                    
             "inclusionGroup": "inclusions",                                             
             "gmshConfigChanges": {"General.Terminal": 0,                                
-                                  "General.Verbosity":4,
+                                  "General.Verbosity":0,
                                   "General.AbortOnError": 2,
                                   "Geometry.OCCBoundsUseStl": 0,
                                   "Geometry.Tolerance": 1e-6,
