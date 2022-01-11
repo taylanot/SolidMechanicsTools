@@ -1,5 +1,5 @@
 from setuptools import setup
-
+import os 
 #setup(
 #   name='SolidMechanicsTools',
 #   version='0.0.1',
@@ -16,4 +16,9 @@ setup(
    author='O.T. Turan',
    author_email='taylanozgurturan@gmail.com',
    packages=['SolidMechanicsTools'],
+   package_data={
+       'SolidMechanicsTools': [os.path.join('materials','*.py'),\
+               os.path.join('src','*.py'),os.path.join('models','*.py')],
+       },
+
 )
