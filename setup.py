@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import os 
 setup(
    name='SolidMechanicsTools',
@@ -6,7 +6,7 @@ setup(
    description='Solid Mechanics Toolbox for FEniCS',
    author='O.T. Turan',
    author_email='taylanozgurturan@gmail.com',
-   packages=setuptools.find_packages(),
+   packages=find_packages(),
    include_package_data=True,
 )
 
