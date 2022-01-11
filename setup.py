@@ -16,7 +16,7 @@ setup(
    description='Solid Mechanics Toolbox for FEniCS',
    author='O.T. Turan',
    author_email='taylanozgurturan@gmail.com',
-   packages=['materials','src','models'],
+   packages=['SolidMechanicsTools','SolidMechanicsTools.materials','SolidMechanicsTools.src','SolidMechanicsTools.models'],
    #package_data={
    #    'SolidMechanicsTools': [os.path.join('materials','*.py'),\
    #            os.path.join('src','*.py'),os.path.join('models','*.py')],
