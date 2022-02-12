@@ -40,7 +40,7 @@ class Create_RVE_gmshModel():
             "domainGroup": "domain",                                                    
             "inclusionGroup": "inclusions",                                             
             "gmshConfigChanges": {"General.Terminal": 1,                                
-                                  "General.Verbosity":4,
+                                  "General.Verbosity":0,
                                   "General.AbortOnError": 2,
                                   "Geometry.Tolerance": 1.e-6,
                                   "Geometry.OCCBoundsUseStl": 0,
