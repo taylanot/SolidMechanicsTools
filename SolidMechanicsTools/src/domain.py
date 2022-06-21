@@ -35,28 +35,38 @@ class DOMAIN():
             #xdmf_extract(self.fname)
             self.__read_xdmf()
 
-        self.dim = self.mesh.geometry().dim()           # Dimension of the domain
-        self.ele_num = self.mesh.num_cells()            # Number of elements in the domain
-        self.phases = np.unique(self.subdomains.array()).astype(int)    # Number of phases in the domain
+        ################################
+        # Dimension of the domain
+        # Number of elements in the domain
+        # Number of phases in the domain
+        ################################
+        self.dim = self.mesh.geometry().dim()           
+        self.ele_num = self.mesh.num_cells()            
+        self.phases = np.unique(self.subdomains.array()).astype(int)    
 
-        #self.verticies, self.vol = self.__get_vertices()
-        self.bounds, self.vol = self.__get_bounds()     # Get the bounds and calculate the volume of the domain
-        self.__get_volume()                             # Get volume of every element 
+        ################################
+        # Get the bounds and calculate the volume of the domain
+        # Get volume of every element 
+        ################################
+        self.bounds, self.vol = self.__get_bounds()     
+        self.__get_volume()                             
         
     def __read_xml(self):
         """
 
-        Note:Legacy extension try not to use this method. Just here for some tests!
+        Note:Legacy extension try not to use this method. 
 
         """
 
         self.mesh = Mesh(self.name+".xml")
-        self.subdomains = MeshFunction("size_t", self.mesh, self.name+"_physical_region.xml")
-        self.facets = MeshFunction("size_t", self.mesh, self.name+"_facet_region.xml")
+        self.subdomains = MeshFunction("size_t", self.mesh, \
+                self.name+"_physical_region.xml")
+        self.facets = MeshFunction("size_t", self.mesh, \
+                self.name+"_facet_region.xml")
 
     def __read_xdmf(self):
         """
-            To do: name_to_read -> more specific names like subdomain and stuff!
+            To do: name_to_read -> more specific names like subdomain!
         """
 
         ################################

@@ -16,13 +16,14 @@ class RVE():
 
         """ Initialize """
 
-        self.module_name = module_name                  # Name module
-        self.domain= domain                             # Get domain
-        self.bc = bc                                    # Get boundary conditions
+        self.module_name = module_name    # Name module
+        self.domain= domain               # Get domain
+        self.bc = bc                      # Get boundary conditions
         
         ################################
         # Define function spaces for the problem
         ################################
+
         if Ve is None:
             self.Ve = VectorElement("CG", domain.mesh.ufl_cell(), 1)
 
@@ -30,6 +31,11 @@ class RVE():
         # Define function space for the pure Neumann Lagrange multiplier
         ################################
         self.Re = VectorElement("R", domain.mesh.ufl_cell(), 0)
+
+        ################################
+        # Mixed function space initialization with periodic boundary conditions
+        ################################
+        self.W = FunctionSpace(self.domain.mesh, MixedElement([self.Ve, self.Re]), constrained_domain=bc)
 
     def problem(self):
         """ Method: Variational problem definition """

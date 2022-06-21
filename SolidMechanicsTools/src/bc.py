@@ -29,15 +29,17 @@ class PeriodicBoundary(SubDomain):
 
         """ Initialize """
 
-        SubDomain.__init__(self,tolerance)              # Initialize the base-class (Note: the tolerance is needed for the mapping method)
+        SubDomain.__init__(self,tolerance)              
 
         ################################
         # Get the extrema of the domain for every direction
         ################################
         self.mins = np.array(domain.bounds[0])          
         self.maxs = np.array(domain.bounds[1])
-
-        self.directions = np.flatnonzero(self.maxs - self.mins)     # Mark non-zero directions
+        ################################
+        # Mark non-zero directions
+        ################################
+        self.directions = np.flatnonzero(self.maxs - self.mins)     
         
         ################################
         # Definie periodic directions
@@ -49,9 +51,9 @@ class PeriodicBoundary(SubDomain):
             self.periodic_dir = periodicity
 
         self.tol = tolerance 
-        self.master = []                                # Master nodes 
-        self.map_master = []                            # Mapped master nodes
-        self.map_slave = []                             # Mapped slave nodes
+        self.master = []        # Master nodes 
+        self.map_master = []    # Mapped master nodes
+        self.map_slave = []     # Mapped slave nodes
 
     def inside(self,x,on_boundary):
         ################################
@@ -71,7 +73,7 @@ class PeriodicBoundary(SubDomain):
 
         return x_master
 
-    # Overwrite map method of SubDomain class to define the mapping master -> slave
+    # Overwrite map method of SubDomain class master -> slave
     def map(self,x,y):
         ################################
         # Map the master nodes to slaves
@@ -86,9 +88,12 @@ class PeriodicBoundary(SubDomain):
                     y[axis]=x[axis]                                
             else:                                                  
                 y[axis]=x[axis]                                    
-
+        ################################
+        # add y to list mapped master coordinates
+        # add x to list of mapped slave coordinates
+        ################################
         if x_slave:
-            self.map_master.append(cp.deepcopy(y))                            # add y to list mapped master coordinates
-            self.map_slave.append(cp.deepcopy(x))                             # add x to list of mapped slave coordinates
+            self.map_master.append(cp.deepcopy(y))
+            self.map_slave.append(cp.deepcopy(x)) 
 
 

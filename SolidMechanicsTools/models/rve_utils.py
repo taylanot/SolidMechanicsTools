@@ -12,14 +12,15 @@ class Create_RVE_gmshModel():
 
     """
 
-    def __init__(self, dim=2, directory=None, name='gmshModelRVE-collect', ext='.msh', save=True):
+    def __init__(self, dim=2, directory=None, name='gmshModelRVE-collect', \
+            ext='.msh', save=True):
         
         """ Initialize """
 
-        self.dim = dim                      # Dimension of RVE 2 or 3 
+        self.dim = dim             # Dimension of RVE 2 or 3 
 
-        self.write_ext = ext                # Extension for saving 
-        self.read_ext = '.xdmf'             # Extension for reading 
+        self.write_ext = ext       # Extension for saving 
+        self.read_ext = '.xdmf'    # Extension for reading 
         self.save = save
         
         if directory is None:
@@ -44,7 +45,7 @@ class Create_RVE_gmshModel():
                                   "General.AbortOnError": 2,
                                   "Geometry.Tolerance": 1.e-6,
                                   "Geometry.OCCBoundsUseStl": 0,
-                                  "Mesh.CharacteristicLengthExtendFromBoundary": 0}}
+                            "Mesh.CharacteristicLengthExtendFromBoundary": 0}}
 
         self.modelingParameters = {                                                            
             "placementOptions": {"maxAttempts": 100000,                                  
@@ -54,8 +55,8 @@ class Create_RVE_gmshModel():
         self.meshingParameters={                                                             
             "threads": None,                                                            
             "refinementOptions": {"maxMeshSize": 0.1,                                
-                                  "inclusionRefinement": False,                          
-                                  "interInclusionRefinement": False,                    
+                                  "inclusionRefinement": True,                          
+                                  "interInclusionRefinement": True,                    
                                   "elementsPerCircumference": 10,                       
                                   "elementsBetweenInclusions": 10,                       
                                   "inclusionRefinementWidth": 5,                        
@@ -72,7 +73,8 @@ class Create_RVE_gmshModel():
         self.Lc = Lc
         self.r = r
 
-        self.directory += '-'+str(self.dim)+'D-L:'+str(self.Lc)+'-r:'+str(self.r)
+        self.directory += '-'+str(self.dim)+'D-L:'+str(self.Lc)+'-r:'+\
+                str(self.r)
 
         try:
             self.create(tag)
@@ -129,7 +131,8 @@ class Create_RVE_gmshModel():
                 break
             except:
                 self.RVE.close()
-                print("RVE Creation counter {0}/{1}!".format(trial, self.max_trial))
+                print("RVE Creation counter {0}/{1}!".format(trial, \
+                        self.max_trial))
 
 
         self.placed = np.sum(self.RVE.placementInfo)
@@ -159,9 +162,9 @@ class Create_RVE_gmshModel():
 
         xdmf_extract(self.directory+self.write_ext)
 
-##############################################################################################
+###############################################################################
 # UTILITIES for preparing the domain for fenics
-##############################################################################################
+###############################################################################
 
 def dolfin_convert(filename):
     """
